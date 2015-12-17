@@ -6185,7 +6185,9 @@ Elm.Main.make = function (_elm) {
    if (_elm.Main.values) return _elm.Main.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -6201,14 +6203,28 @@ Elm.Main.make = function (_elm) {
    var clickSignal = A2($Signal.sampleOn,
    $Mouse.clicks,
    $Mouse.position);
+   var planet = F3(function (diameter,color,coords) {
+      return A2($Graphics$Collage.move,
+      coords,
+      A2($Graphics$Collage.filled,
+      color,
+      $Graphics$Collage.circle(diameter)));
+   });
    var view = F2(function (_p0,planets) {
       var _p1 = _p0;
-      return $Graphics$Element.show(planets);
+      return A3($Graphics$Collage.collage,_p1._0,_p1._1,planets);
    });
    var update = F2(function (mousePos,planets) {
-      return A2($List._op["::"],mousePos,planets);
+      var _p2 = {ctor: "_Tuple2"
+                ,_0: $Basics.toFloat($Basics.fst(mousePos))
+                ,_1: $Basics.toFloat($Basics.snd(mousePos))};
+      var x = _p2._0;
+      var y = _p2._1;
+      return A2($List._op["::"],
+      A3(planet,30.0,$Color.red,{ctor: "_Tuple2",_0: x,_1: y}),
+      planets);
    });
-   var planets = _U.list([{ctor: "_Tuple2",_0: 50,_1: 50}]);
+   var planets = _U.list([]);
    var main = A3($Signal.map2,
    view,
    $Window.dimensions,
@@ -6217,6 +6233,7 @@ Elm.Main.make = function (_elm) {
                              ,planets: planets
                              ,update: update
                              ,view: view
+                             ,planet: planet
                              ,main: main
                              ,clickSignal: clickSignal
                              ,clickCount: clickCount};

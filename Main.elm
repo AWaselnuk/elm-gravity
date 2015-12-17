@@ -6,40 +6,37 @@ import Window
 
 -- MODEL
 
--- TODO: Turn model into list of Graphics forms that represent planets
 type alias Planet =
-  (Int, Int)
+  Form
 
-type alias Model =
-  List (Int, Int)
+type alias Planets =
+  List Form
 
-planets : Model
+planets : Planets
 planets =
-  [(50, 50)]
+  []
 
 -- UPDATE
 
-update : (Int, Int) -> Model -> Model
+-- TODO: Set proper coords
+update : (Int, Int) -> Planets -> Planets
 update mousePos planets =
-  mousePos :: planets
+  let
+    (x, y) = (toFloat (fst mousePos), toFloat (snd mousePos))
+  in
+    (planet 30.0 red (x, y)) :: planets
 
 -- VIEW
 
-view : (Int, Int) -> List (Int, Int) -> Element
+view : (Int, Int) -> Planets -> Element
 view (w, h) planets =
-  let
-    (x, y) =
-      Maybe.withDefault (0, 0) (List.head planets)
-    (dx, dy) =
-      (toFloat x - toFloat w / 2, toFloat h / 2 - toFloat y)
-    diameter =
-      30
-  in
-    collage w h
-      [ circle diameter
-          |> filled red
-          |> move (dx, dy)
-      ]
+  collage w h planets
+
+planet : Float -> Color -> (Float, Float) -> Planet
+planet diameter color coords =
+  circle diameter
+    |> filled color
+    |> move coords
 
 -- SIGNALS
 
