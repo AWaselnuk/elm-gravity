@@ -6194,6 +6194,7 @@ Elm.Main.make = function (_elm) {
    $Mouse = Elm.Mouse.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $Text = Elm.Text.make(_elm),
    $Window = Elm.Window.make(_elm);
    var _op = {};
    var windowClickToCoords = F2(function (_p1,_p0) {    var _p2 = _p1;var _p3 = _p0;return {w: _p2._0,h: _p2._1,x: _p3._0,y: _p3._1};});
@@ -6202,12 +6203,16 @@ Elm.Main.make = function (_elm) {
    var planet = F3(function (diameter,color,coords) {
       return A2($Graphics$Collage.move,coords,A2($Graphics$Collage.filled,color,$Graphics$Collage.circle(diameter)));
    });
-   var view = F2(function (_p4,planets) {    var _p5 = _p4;return A3($Graphics$Collage.collage,_p5._0,_p5._1,planets);});
+   var view = F2(function (_p4,planets) {
+      var _p5 = _p4;
+      var instructions = $Graphics$Collage.text(A2($Text.color,$Color.darkGrey,A2($Text.height,40,$Text.fromString("Just click"))));
+      return A3($Graphics$Collage.collage,_p5._0,_p5._1,A2($List._op["::"],instructions,planets));
+   });
    var update = F2(function (coords,planets) {
       var _p6 = {ctor: "_Tuple2",_0: $Basics.toFloat(coords.x) - $Basics.toFloat(coords.w) / 2,_1: $Basics.toFloat(coords.h) / 2 - $Basics.toFloat(coords.y)};
       var dx = _p6._0;
       var dy = _p6._1;
-      return A2($List._op["::"],A3(planet,30.0,$Color.green,{ctor: "_Tuple2",_0: dx,_1: dy}),planets);
+      return A2($List._op["::"],A3(planet,30.0,$Color.orange,{ctor: "_Tuple2",_0: dx,_1: dy}),planets);
    });
    var planets = _U.list([]);
    var main = A3($Signal.map2,view,$Window.dimensions,A3($Signal.foldp,update,planets,windowClickSignal));

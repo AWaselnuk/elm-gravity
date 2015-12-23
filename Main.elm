@@ -1,6 +1,7 @@
 import Color exposing (..)
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
+import Text
 import Mouse
 import Window
 
@@ -27,13 +28,21 @@ update coords planets =
     (dx, dy) =
       (toFloat coords.x - toFloat coords.w / 2, toFloat coords.h / 2 - toFloat coords.y)
   in
-    (planet 30.0 green (dx, dy)) :: planets
+    (planet 30.0 orange (dx, dy)) :: planets
 
 -- VIEW
 
 view : (Int, Int) -> Planets -> Element
 view (w, h) planets =
-  collage w h planets
+  let
+    instructions =
+      "Just click"
+        |> Text.fromString
+        |> Text.height 40
+        |> Text.color darkGrey
+        |> text
+  in
+    collage w h (instructions::planets)
 
 planet : Float -> Color -> (Float, Float) -> Planet
 planet diameter color coords =
