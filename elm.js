@@ -6196,45 +6196,30 @@ Elm.Main.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Window = Elm.Window.make(_elm);
    var _op = {};
-   var clickCount = A3($Signal.foldp,
-   F2(function (click,total) {    return total + 1;}),
-   0,
-   $Mouse.clicks);
-   var clickSignal = A2($Signal.sampleOn,
-   $Mouse.clicks,
-   $Mouse.position);
+   var windowClickToCoords = F2(function (_p1,_p0) {    var _p2 = _p1;var _p3 = _p0;return {w: _p2._0,h: _p2._1,x: _p3._0,y: _p3._1};});
+   var clickSignal = A2($Signal.sampleOn,$Mouse.clicks,$Mouse.position);
+   var windowClickSignal = A3($Signal.map2,windowClickToCoords,$Window.dimensions,clickSignal);
    var planet = F3(function (diameter,color,coords) {
-      return A2($Graphics$Collage.move,
-      coords,
-      A2($Graphics$Collage.filled,
-      color,
-      $Graphics$Collage.circle(diameter)));
+      return A2($Graphics$Collage.move,coords,A2($Graphics$Collage.filled,color,$Graphics$Collage.circle(diameter)));
    });
-   var view = F2(function (_p0,planets) {
-      var _p1 = _p0;
-      return A3($Graphics$Collage.collage,_p1._0,_p1._1,planets);
-   });
-   var update = F2(function (mousePos,planets) {
-      var _p2 = {ctor: "_Tuple2"
-                ,_0: $Basics.toFloat($Basics.fst(mousePos))
-                ,_1: $Basics.toFloat($Basics.snd(mousePos))};
-      var x = _p2._0;
-      var y = _p2._1;
-      return A2($List._op["::"],
-      A3(planet,30.0,$Color.red,{ctor: "_Tuple2",_0: x,_1: y}),
-      planets);
+   var view = F2(function (_p4,planets) {    var _p5 = _p4;return A3($Graphics$Collage.collage,_p5._0,_p5._1,planets);});
+   var update = F2(function (coords,planets) {
+      var _p6 = {ctor: "_Tuple2",_0: $Basics.toFloat(coords.x) - $Basics.toFloat(coords.w) / 2,_1: $Basics.toFloat(coords.h) / 2 - $Basics.toFloat(coords.y)};
+      var dx = _p6._0;
+      var dy = _p6._1;
+      return A2($List._op["::"],A3(planet,30.0,$Color.green,{ctor: "_Tuple2",_0: dx,_1: dy}),planets);
    });
    var planets = _U.list([]);
-   var main = A3($Signal.map2,
-   view,
-   $Window.dimensions,
-   A3($Signal.foldp,update,planets,clickSignal));
+   var main = A3($Signal.map2,view,$Window.dimensions,A3($Signal.foldp,update,planets,windowClickSignal));
+   var Coords = F4(function (a,b,c,d) {    return {w: a,h: b,x: c,y: d};});
    return _elm.Main.values = {_op: _op
+                             ,Coords: Coords
                              ,planets: planets
                              ,update: update
                              ,view: view
                              ,planet: planet
                              ,main: main
                              ,clickSignal: clickSignal
-                             ,clickCount: clickCount};
+                             ,windowClickSignal: windowClickSignal
+                             ,windowClickToCoords: windowClickToCoords};
 };

@@ -12,19 +12,22 @@ type alias Planet =
 type alias Planets =
   List Form
 
+type alias Coords =
+  { w : Int, h : Int, x : Int, y : Int }
+
 planets : Planets
 planets =
   []
 
 -- UPDATE
 
--- TODO: Set proper coords
-update : (Int, Int) -> Planets -> Planets
-update mousePos planets =
+update : Coords -> Planets -> Planets
+update coords planets =
   let
-    (x, y) = (toFloat (fst mousePos), toFloat (snd mousePos))
+    (dx, dy) =
+      (toFloat coords.x - toFloat coords.w / 2, toFloat coords.h / 2 - toFloat coords.y)
   in
-    (planet 30.0 red (x, y)) :: planets
+    (planet 30.0 green (dx, dy)) :: planets
 
 -- VIEW
 
@@ -42,12 +45,16 @@ planet diameter color coords =
 
 main : Signal Element
 main =
-  Signal.map2 view Window.dimensions (Signal.foldp update planets clickSignal)
+  Signal.map2 view Window.dimensions (Signal.foldp update planets windowClickSignal)
 
 clickSignal : Signal (Int, Int)
 clickSignal =
   Signal.sampleOn Mouse.clicks Mouse.position
 
-clickCount : Signal Int
-clickCount =
-  Signal.foldp (\click total -> total + 1) 0 Mouse.clicks
+windowClickSignal : Signal Coords
+windowClickSignal =
+  Signal.map2 windowClickToCoords Window.dimensions clickSignal
+
+windowClickToCoords : (Int, Int) -> (Int, Int) -> Coords
+windowClickToCoords (w, h) (x, y) =
+  { w = w, h = h, x = x, y = y }
